@@ -10,31 +10,24 @@ long long   get_time(void)
 
 void	eat_routine(t_philo *philo)
 {
-	long long	start_eating;
-	int			left_philo_id;
 	t_vars		*vars;
 
 	vars = philo->vars;
-	if (vars->nb_philo == 1)
-		left_philo_id = philo->id - 1;
-	else if (philo->id == 1)
-		left_philo_id = vars->nb_philo - 1;
-	else
-		left_philo_id = philo->id - 2;
-	pthread_mutex_lock(&(vars->philo[left_philo_id].right_fork));
+	sem_wait(&(vars->forks));
 	print_status(vars, philo->id, "has taken a fork");
-	pthread_mutex_lock(&(vars->philo[philo->id - 1].right_fork));
+	sem_wait(&(vars->forks));
 	print_status(vars, philo->id, "has taken a fork");
 	philo->eating = 1;
-	start_eating = get_time();
-	philo->last_meal = start_eating;
+	philo->last_meal = get_time();
+	sem_wait(&(philo->eat));
 	print_status(vars, philo->id, "is eating");
 	usleep((vars->eat_time - 10) * 1000);
-	while (get_time() - start_eating < vars->eat_time);
-	philo->eat_count++;
+	while (get_time() - philo->last_meal < vars->eat_time);
 	philo->eating = 0;
-	pthread_mutex_unlock(&(vars->philo[philo->id - 1].right_fork));
-	pthread_mutex_unlock(&(vars->philo[left_philo_id].right_fork));
+	sem_post(&(philo->eat));
+	sem_post(&(philo->vars->philo_eating));
+	sem_post(&(vars->forks));
+	sem_post(&(vars->forks));
 }
 
 void	*routine(void *data)
@@ -45,7 +38,7 @@ void	*routine(void *data)
 
 	philo = (t_philo *) data;
 	vars = philo->vars;
-	while (vars->death_time == -1)
+	while (1)
 	{
 		eat_routine(philo);
 		print_status(vars, philo->id, "is sleeping");
