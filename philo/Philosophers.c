@@ -1,91 +1,108 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Philosophers.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oessamdi <oessamdi@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/25 12:41:41 by oessamdi          #+#    #+#             */
+/*   Updated: 2022/06/25 12:41:41 by oessamdi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Philosophers.h"
-
-
 
 int	all_eat_count(t_vars *vars)
 {
-    int     i;
-    int     count;
-    t_philo *philo;
+	int		i;
+	int		count;
+	t_philo	*philo;
 
-    philo = vars->philo;
-    count = philo[0].eat_count;
-    i = 1;
-    while (i < vars->nb_philo)
-    {
-        if (philo[i].eat_count < count)
-            count = philo[i].eat_count;
-        i++;
-    }
-    return (count);
+	philo = vars->philo;
+	count = philo[0].eat_count;
+	i = 1;
+	while (i < vars->nb_philo)
+	{
+		if (philo[i].eat_count < count)
+			count = philo[i].eat_count;
+		i++;
+	}
+	return (count);
 }
 
-int check_starving(t_vars *vars)
+int	check_starving(t_vars *vars)
 {
-    int     i;
-    t_philo *philo;
+	int		i;
+	t_philo	*philo;
 
-    philo = vars->philo;
-    while (vars->nb_eat == -2 || vars->nb_eat > all_eat_count(vars))
-    {
-        i = 0;
-        while (i < vars->nb_philo)
-        {
-            if (philo[i].eating != 1 && (get_time() - philo[i].last_meal >= vars->die_time))
-            {
-                pthread_mutex_lock(&(vars->philo[i].eating));
+	philo = vars->philo;
+	while (vars->nb_eat == -2 || vars->nb_eat > all_eat_count(vars))
+	{
+		i = 0;
+		while (i < vars->nb_philo)
+		{
+			if (philo[i].eating != 1
+				&& (get_time() - philo[i].last_meal >= vars->die_time))
+			{
+				pthread_mutex_lock(&(vars->philo[i].eat));
 				vars->death_time = 1;
-                print_status(vars, i + 1, "died");
-                return (0);
-            }
-            i++;
-        }
-    }
-    return (0);
+				print_status(vars, i + 1, "died");
+				return (0);
+			}
+			i++;
+		}
+	}
+	return (0);
 }
 
-int start_simulation(t_vars *vars)
+int	start_simulation(t_vars *vars)
 {
-    int i;
-    t_philo *philos;
+	int		i;
+	t_philo	*philos;
 
-    vars->start = get_time();
-    init_philos(vars);
-    if (pthread_mutex_init(&(vars->writing), NULL))
-            return (-1);
-    philos = vars->philo;
-    vars->death_time = -1;
-    i = 0;
-    while (i < vars->nb_philo)
-    {
+	vars->start = get_time();
+	init_philos(vars);
+	if (pthread_mutex_init(&(vars->writing), NULL))
+		return (-1);
+	philos = vars->philo;
+	vars->death_time = -1;
+	i = 0;
+	while (i < vars->nb_philo)
+	{
 		philos[i].last_meal = get_time();
-        if (pthread_create(&(philos[i].th_id), NULL, &routine, philos + i) != 0)
-            return (-1);
-        i++;
+		if (pthread_create(&(philos[i].th_id), NULL, &routine, philos + i) != 0)
+			return (-1);
+		i++;
 		usleep(100);
-    }
-    check_starving(vars);
-    return (0);
+	} 
+	check_starving(vars);
+	return (0);
 }
 
-int error_msg(int id)
+int	error_msg(int id)
 {
-	//write(1, "Error\n", 6);
-    return (0);
+	if (id == -1)
+		write(2, "Error\n", 6);
+	else if (id == -2)
+		write(2, "Wrong number of arguments\n", 26);
+	else if (id == -3)
+		write(2, "Invalid Arguments\n", 17);
+	return (0);
 }
 
-int main(int ac, char **av)
+int	main(int ac, char **av)
 {
-    t_vars  *vars;
-    int     error;
+	t_vars	*vars;
+	int		error;
 
-    g_check = 0;
 	vars = malloc(sizeof(t_vars));
-    error = check_init_args(ac, av, vars);
-    if (error != 1)
-        return (error_msg(error));
+	error = check_init_args(ac, av, vars);
+	if (error != 1)
+		return (error_msg(error));
+	if (vars->nb_eat == 0)
+		return (0);
 	error = start_simulation(vars);
-    if (error != 1)
-        return (error_msg(error));
-    return (0);
+	if (error != 1)
+		return (error_msg(error));
+	return (0);
 }

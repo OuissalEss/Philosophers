@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   print.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oessamdi <oessamdi@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/25 12:44:33 by oessamdi          #+#    #+#             */
+/*   Updated: 2022/06/25 12:44:33 by oessamdi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Philosophers.h"
 
 void	ft_putchar_fd(char c, int fd)
@@ -18,7 +30,7 @@ void	ft_putnbr_fd(int n, int fd)
 
 void	ft_putstr_fd(char *s, int fd)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (s[i])
@@ -34,7 +46,7 @@ void	print_status(t_vars *vars, int id, char *state)
 
 	now = get_time() - vars->start;
 	pthread_mutex_lock(&(vars->writing));
-    printf("%d %d %s\n", now, id, state);
+	printf("%d %d %s\n", now, id, state);
 	if (state[0] != 'd')
 		pthread_mutex_unlock(&(vars->writing));
 }
