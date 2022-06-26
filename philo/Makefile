@@ -14,6 +14,8 @@ NAME = philo
 
 SRC = Philosophers.c init.c routine.c print.c 
 
+CC = @gcc
+
 CFLAGS = -Wall -Wextra -Werror #-fsanitize=thread
 
 DEBUG = -fsanitize=address -g
@@ -22,10 +24,8 @@ OBJC = $(SRC:.c=.o)
 
 RM = @rm -f
 
-CC = @gcc
-
 $(NAME) : $(OBJC)
-			$(CC) $(CFLAGS) -pthread $(OBJC)  -o $(NAME)
+			$(CC) $(CFLAGS) -pthread $(OBJC) -o $(NAME)
 			@echo "\033[1;32mPHILO CREATED!"
 
 all : $(NAME)

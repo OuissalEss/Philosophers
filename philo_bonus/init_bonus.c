@@ -1,9 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_bonus.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oessamdi <oessamdi@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/25 12:44:33 by oessamdi          #+#    #+#             */
+/*   Updated: 2022/06/25 12:44:33 by oessamdi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Philosophers.h"
 
-int ft_atoi(char const *str)
+int	ft_atoi(char const *str)
 {
 	unsigned long	res;
-	int				sign;
 	int				i;
 
 	res = 0;
@@ -22,7 +33,7 @@ int ft_atoi(char const *str)
 	return ((int) res);
 }
 
-int check_init_args(int ac, char **av, t_vars *v)
+int	check_init_args(int ac, char **av, t_vars *v)
 {
 	if (ac < 5 || ac > 6)
 		return (-1);
@@ -35,22 +46,19 @@ int check_init_args(int ac, char **av, t_vars *v)
 		v->nb_eat = ft_atoi(av[5]);
 	if (v->nb_philo < 1 || v->die_time < 0 || v->eat_time < 0 || v->sleep_time < 0 || v->nb_eat == -1)
 		return (-1);
-	//sem_unlink("fork");
 	v->forks = sem_open("fork", O_CREAT, 0644, v->nb_philo);
 	if (v->forks == SEM_FAILED)
 		return (-1);
-	//sem_unlink("writing");
 	v->writing = sem_open("writing", O_CREAT, 0644, 1);
 	if (v->writing == SEM_FAILED)
 		return (-1);
-	//sem_unlink("philo_eating");
 	v->philo_eating = sem_open("philo_eating", O_CREAT, 0644, 1);
 	if (v->philo_eating == SEM_FAILED)
 		return (-1);
 	return (1);
 }
 
-int init_philos(t_vars *vars)
+int	init_philos(t_vars *vars)
 {
 	int		i;
 	t_philo	*philo;
@@ -64,7 +72,6 @@ int init_philos(t_vars *vars)
 		philo[i].sleeping = 0;
 		philo[i].thinking = 0;
 		philo[i].eat_count = 0;
-		//sem_unlink("eating");
 		philo[i].eat = sem_open("eating", O_CREAT, 0644, 1);
 		if (philo[i].eat == SEM_FAILED)
 			return (-1);

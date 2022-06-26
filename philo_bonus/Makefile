@@ -12,9 +12,9 @@
 
 NAME = philo_bonus
 
-SRC = Philosophers.c init.c routine.c print.c 
+SRC = philosophers_bonus.c init_bonus.c routine_bonus.c print_bonus.c 
 
-CC = @gcc -pthread $(SRC) 
+CC = @gcc
 
 CFLAGS = -Wall -Wextra -Werror
 
@@ -24,18 +24,22 @@ OBJC = $(SRC:.c=.o)
 
 RM = @rm -f
 
-$(NAME) : $(SRC)
-			$(CC) -o $(NAME)
+$(NAME) : $(OBJC)
+			$(CC) $(CFLAGS) -pthread $(OBJC) -o $(NAME)
+			@echo "\033[1;32mPHILO CREATED!"
 
 all : $(NAME)
 
 debug :
-	gcc $(CFLAGS) $(DEBUG) $(SRC) -o $(NAME)
+	gcc  $(DEBUG) $(SRC) -o $(NAME)
 
 clean :
-
+		$(RM) *.o
+		@echo "Removed all the .o files"
 fclean :
-			$(RM) $(NAME)
+		$(RM) *.o
+		$(RM) $(NAME)
+		@echo "Removed executble"
 
 re : fclean all
 

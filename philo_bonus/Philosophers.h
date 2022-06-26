@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.h                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oessamdi <oessamdi@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/25 12:44:33 by oessamdi          #+#    #+#             */
+/*   Updated: 2022/06/25 12:44:33 by oessamdi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
 
@@ -6,9 +18,12 @@
 # include <unistd.h>
 # include <sys/time.h>
 # include <pthread.h>
-#include <semaphore.h>
+# include <semaphore.h>
+# include <sys/wait.h>
+# include <signal.h>
+# include <fcntl.h>
 
-struct	s_vars;
+struct s_vars;
 
 typedef struct	s_philo
 {
@@ -20,11 +35,11 @@ typedef struct	s_philo
 	long long		last_meal;
 	int				eat_count;
 	pthread_t		th_id;
-	sem_t			eat;
+	sem_t			*eat;
 	struct s_vars	*vars;
 }				t_philo;
 
-typedef struct s_vars
+typedef struct	s_vars
 {
 	int				nb_philo;
 	int				die_time;
@@ -32,9 +47,9 @@ typedef struct s_vars
 	int				sleep_time;
 	int				nb_eat;
 	long long		start;
-	sem_t			philo_eating;
-	sem_t			forks;
-	sem_t			writing;
+	sem_t			*philo_eating;
+	sem_t			*forks;
+	sem_t			*writing;
 	t_philo			*philo;
 	pthread_t		tid;
 	pthread_t		eat_count;

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers_bonus.c                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oessamdi <oessamdi@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/25 12:44:33 by oessamdi          #+#    #+#             */
+/*   Updated: 2022/06/25 12:44:33 by oessamdi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Philosophers.h"
 
 int	all_eat_count(t_vars *vars)
@@ -56,17 +68,19 @@ void	kill_child_processes(t_vars *vars)
 	}
 }
 
-void	check_eat(t_vars *vars)
+void	*check_eat(void *data)
 {
-	int	cp;
-	int	i;
+	int		cp;
+	int		i;
+	t_vars	*vars;
 
 	cp = 0;
+	vars = (t_vars *)data;
 	while (cp < vars->nb_eat)
 	{
 		while (i < vars->nb_philo)
 		{
-			wait(vars->philo_eating);
+			sem_wait(vars->philo_eating);
 			i++;
 		}
 		cp++;
@@ -77,6 +91,7 @@ void	check_eat(t_vars *vars)
 		kill(vars->philo[i].pid, SIGKILL);
 		i++;
 	}
+	return (NULL);
 }
 
 int	start_simulation(t_vars *vars)
@@ -85,7 +100,7 @@ int	start_simulation(t_vars *vars)
 	t_philo	*philos;
 
 	if (vars->eat_time != -2)
-		if (pthread_create(&(vars->eat_count), NULL, &check_eat, philos + i) != 0)
+		if (pthread_create(&(vars->eat_count), NULL, &check_eat, vars) != 0)
 				return (-1);
 	philos = vars->philo;
 	vars->start = get_time();
@@ -110,7 +125,12 @@ int	start_simulation(t_vars *vars)
 
 int	error_msg(int id)
 {
-	//write(1, "Error\n", 6);
+	if (id == -1)
+		write(2, "Error\n", 6);
+	else if (id == -2)
+		write(2, "Wrong number of arguments\n", 26);
+	else if (id == -3)
+		write(2, "Invalid Arguments\n", 17);
 	return (0);
 }
 
