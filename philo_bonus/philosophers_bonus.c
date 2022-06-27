@@ -41,7 +41,7 @@ int	check_starving(t_philo *philo)
 		{
 			sem_wait(philo->eat);
 			print_status(vars, philo->id, "died");
-			return (0);
+			exit(1);
 		}
 	}
 	return (0);
@@ -53,11 +53,13 @@ void	kill_child_processes(t_vars *vars)
 	int	x;
 	int	status;
 
+	i = 0;
 	while (i < vars->nb_philo)
 	{
 		waitpid(-1, &status, 0);
 		if (WIFSIGNALED(status) || WIFEXITED(status))
 		{
+			x = 0;
 			while (x < vars->nb_philo)
 			{
 				kill(vars->philo[x].pid, SIGKILL);
@@ -78,6 +80,7 @@ void	*check_eat(void *data)
 	vars = (t_vars *)data;
 	while (cp < vars->nb_eat)
 	{
+		i = 0;
 		while (i < vars->nb_philo)
 		{
 			sem_wait(vars->philo_eating);
@@ -99,7 +102,7 @@ int	start_simulation(t_vars *vars)
 	int		i;
 	t_philo	*philos;
 
-	if (vars->eat_time != -2)
+	if (vars->nb_eat != -2)
 		if (pthread_create(&(vars->eat_count), NULL, &check_eat, vars) != 0)
 				return (-1);
 	philos = vars->philo;
@@ -130,7 +133,7 @@ int	error_msg(int id)
 	else if (id == -2)
 		write(2, "Wrong number of arguments\n", 26);
 	else if (id == -3)
-		write(2, "Invalid Arguments\n", 17);
+		write(2, "Invalid Arguments\n", 18);
 	return (0);
 }
 

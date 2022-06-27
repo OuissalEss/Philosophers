@@ -36,7 +36,7 @@ int	ft_atoi(char const *str)
 int	check_init_args(int ac, char **av, t_vars *v)
 {
 	if (ac < 5 || ac > 6)
-		return (-1);
+		return (-2);
 	v->nb_philo = ft_atoi(av[1]);
 	v->die_time = ft_atoi(av[2]);
 	v->eat_time = ft_atoi(av[3]);
@@ -45,13 +45,16 @@ int	check_init_args(int ac, char **av, t_vars *v)
 	if (ac == 6)
 		v->nb_eat = ft_atoi(av[5]);
 	if (v->nb_philo < 1 || v->die_time < 0 || v->eat_time < 0 || v->sleep_time < 0 || v->nb_eat == -1)
-		return (-1);
+		return (-3);
+	sem_unlink("fork");
 	v->forks = sem_open("fork", O_CREAT, 0644, v->nb_philo);
 	if (v->forks == SEM_FAILED)
 		return (-1);
+	sem_unlink("writing");
 	v->writing = sem_open("writing", O_CREAT, 0644, 1);
 	if (v->writing == SEM_FAILED)
 		return (-1);
+	sem_unlink("philo_eating");
 	v->philo_eating = sem_open("philo_eating", O_CREAT, 0644, 1);
 	if (v->philo_eating == SEM_FAILED)
 		return (-1);
@@ -72,6 +75,7 @@ int	init_philos(t_vars *vars)
 		philo[i].sleeping = 0;
 		philo[i].thinking = 0;
 		philo[i].eat_count = 0;
+		sem_unlink("eating");
 		philo[i].eat = sem_open("eating", O_CREAT, 0644, 1);
 		if (philo[i].eat == SEM_FAILED)
 			return (-1);
