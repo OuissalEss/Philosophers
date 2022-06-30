@@ -30,7 +30,7 @@ int	ft_atoi(char const *str)
 		res = (res * 10) + str[i] - '0';
 		i++;
 	}
-	if (str[i] || res > 9223372036854775807)
+	if (str[i] || res > 2147483647)
 		return (-1);
 	return ((int) res);
 }
@@ -59,6 +59,8 @@ int	init_philos(t_vars *vars)
 
 	i = 0;
 	philo = malloc(sizeof(t_philo) * vars->nb_philo);
+	if (!philo)
+		return (-4);
 	while (i < vars->nb_philo)
 	{
 		philo[i].id = i + 1;
@@ -67,12 +69,12 @@ int	init_philos(t_vars *vars)
 		philo[i].thinking = 0;
 		philo[i].eat_count = 0;
 		if (pthread_mutex_init(&(philo[i].right_fork), NULL))
-			return (-1);
+			return (-5);
 		if (pthread_mutex_init(&(philo[i].eat), NULL))
-			return (-1);
+			return (-5);
 		philo[i].vars = vars;
 		i++;
 	}
 	vars->philo = philo;
-	return (0);
+	return (1);
 }

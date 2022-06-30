@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philosophers.h                                     :+:      :+:    :+:   */
+/*   Philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: oessamdi <oessamdi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/25 12:44:33 by oessamdi          #+#    #+#             */
-/*   Updated: 2022/06/25 12:44:33 by oessamdi         ###   ########.fr       */
+/*   Created: 2022/06/30 09:25:53 by oessamdi          #+#    #+#             */
+/*   Updated: 2022/06/30 09:25:53 by oessamdi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,24 +22,25 @@
 # include <sys/wait.h>
 # include <signal.h>
 # include <fcntl.h>
+# include <stdatomic.h>
 
-struct s_vars;
+struct	s_vars;
 
-typedef struct	s_philo
+typedef struct s_philo
 {
 	int				id;
-	int				pid; 
-	int				eating; 
-	int				sleeping;   
+	int				pid;
+	int				eating;
+	int				sleeping;
 	int				thinking;
-	long long		last_meal;
+	atomic_llong	last_meal;
 	int				eat_count;
 	pthread_t		th_id;
 	sem_t			*eat;
 	struct s_vars	*vars;
 }				t_philo;
 
-typedef struct	s_vars
+typedef struct s_vars
 {
 	int				nb_philo;
 	int				die_time;
@@ -63,12 +64,12 @@ void		print_status(t_vars *vars, int id, char *state);
 int			ft_atoi(char const *str);
 int			check_args(int ac, char **av);
 void		eat_routine(t_philo *philo);
-void		*routine(void *data);
+void		*routine(t_philo *philo);
 int			check_init_args(int ac, char **av, t_vars *v);
 int			init_philos(t_vars *vars);
-int			all_eat_count(t_vars *vars);
-int			check_starving(t_philo *philo);
+void		*check_starving(void *data);
 int			start_simulation(t_vars *vars);
 int			error_msg(int id);
+void		kill_child_processes(t_vars *vars);
 
 #endif

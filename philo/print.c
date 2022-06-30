@@ -50,3 +50,20 @@ void	print_status(t_vars *vars, int id, char *state)
 	if (state[0] != 'd')
 		pthread_mutex_unlock(&(vars->writing));
 }
+
+int	error_msg(int id)
+{
+	write(2, "Error", 5);
+	if (id == -2)
+		write(2, ":\tWrong number of arguments", 26);
+	else if (id == -3)
+		write(2, ":\tInvalid Arguments", 18);
+	else if (id == -4)
+		write(2, ":\tCannot allocate memory", 23);
+	else if (id == -5)
+		write(2, ":\tFailed to create mutex", 23);
+	else if (id == -6)
+		write(2, ":\tFailed to create thread", 24);
+	write(2, "\n", 1);
+	return (0);
+}

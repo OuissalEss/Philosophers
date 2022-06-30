@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: oessamdi <oessamdi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/25 12:44:33 by oessamdi          #+#    #+#             */
-/*   Updated: 2022/06/25 12:44:33 by oessamdi         ###   ########.fr       */
+/*   Created: 2022/06/30 09:23:21 by oessamdi          #+#    #+#             */
+/*   Updated: 2022/06/30 09:23:21 by oessamdi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,14 @@ int	ft_atoi(char const *str)
 		i++;
 	if (str[i] == '+')
 		i++;
+	if (str[i] == '\0')
+		return (-1);
 	while (str[i] >= '0' && str[i] <= '9')
 	{
 		res = (res * 10) + str[i] - '0';
 		i++;
 	}
-	if (str[i] || res > 9223372036854775807)
+	if (str[i] || res > 2147483647)
 		return (-1);
 	return ((int) res);
 }
@@ -44,20 +46,21 @@ int	check_init_args(int ac, char **av, t_vars *v)
 	v->nb_eat = -2;
 	if (ac == 6)
 		v->nb_eat = ft_atoi(av[5]);
-	if (v->nb_philo < 1 || v->die_time < 0 || v->eat_time < 0 || v->sleep_time < 0 || v->nb_eat == -1)
+	if (v->nb_philo < 1 || v->die_time < 0 || v->eat_time < 0
+		|| v->sleep_time < 0 || v->nb_eat == -1)
 		return (-3);
 	sem_unlink("fork");
 	v->forks = sem_open("fork", O_CREAT, 0644, v->nb_philo);
 	if (v->forks == SEM_FAILED)
-		return (-1);
+		return (-5);
 	sem_unlink("writing");
 	v->writing = sem_open("writing", O_CREAT, 0644, 1);
 	if (v->writing == SEM_FAILED)
-		return (-1);
+		return (-5);
 	sem_unlink("philo_eating");
 	v->philo_eating = sem_open("philo_eating", O_CREAT, 0644, 1);
 	if (v->philo_eating == SEM_FAILED)
-		return (-1);
+		return (-5);
 	return (1);
 }
 
@@ -68,6 +71,8 @@ int	init_philos(t_vars *vars)
 
 	i = 0;
 	philo = malloc(sizeof(t_philo) * vars->nb_philo);
+	if (!philo)
+		return (-4);
 	while (i < vars->nb_philo)
 	{
 		philo[i].id = i + 1;
@@ -78,10 +83,10 @@ int	init_philos(t_vars *vars)
 		sem_unlink("eating");
 		philo[i].eat = sem_open("eating", O_CREAT, 0644, 1);
 		if (philo[i].eat == SEM_FAILED)
-			return (-1);
+			return (-5);
 		philo[i].vars = vars;
 		i++;
 	}
 	vars->philo = philo;
-	return (0);
+	return (1);
 }

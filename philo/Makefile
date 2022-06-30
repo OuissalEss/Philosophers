@@ -5,8 +5,8 @@
 #                                                     +:+ +:+         +:+      #
 #    By: oessamdi <oessamdi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/03/05 06:58:42 by oessamdi          #+#    #+#              #
-#    Updated: 2022/06/25 12:57:49 by oessamdi         ###   ########.fr        #
+#    Created: 2022/06/10 09:27:22 by oessamdi          #+#    #+#              #
+#    Updated: 2022/06/30 09:27:45 by oessamdi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,9 @@ SRC = Philosophers.c init.c routine.c print.c
 
 CC = @gcc
 
-CFLAGS = -Wall -Wextra -Werror #-fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror 
+
+RACE = -fsanitize=thread -g
 
 DEBUG = -fsanitize=address -g
 
@@ -32,6 +34,9 @@ all : $(NAME)
 
 debug :
 	gcc  $(DEBUG) $(SRC) -o $(NAME)
+	
+race :
+	gcc  $(RACE) $(SRC) -o $(NAME)
 
 clean :
 		$(RM) *.o

@@ -47,12 +47,12 @@ int	check_starving(t_vars *vars)
 				pthread_mutex_lock(&(vars->philo[i].eat));
 				vars->death_time = 1;
 				print_status(vars, i + 1, "died");
-				return (0);
+				return (1);
 			}
 			i++;
 		}
 	}
-	return (0);
+	return (1);
 }
 
 int	start_simulation(t_vars *vars)
@@ -63,7 +63,7 @@ int	start_simulation(t_vars *vars)
 	vars->start = get_time();
 	init_philos(vars);
 	if (pthread_mutex_init(&(vars->writing), NULL))
-		return (-1);
+		return (-5);
 	philos = vars->philo;
 	vars->death_time = -1;
 	i = 0;
@@ -71,23 +71,12 @@ int	start_simulation(t_vars *vars)
 	{
 		philos[i].last_meal = get_time();
 		if (pthread_create(&(philos[i].th_id), NULL, &routine, philos + i) != 0)
-			return (-1);
+			return (-6);
 		i++;
 		usleep(100);
-	} 
+	}
 	check_starving(vars);
-	return (0);
-}
-
-int	error_msg(int id)
-{
-	if (id == -1)
-		write(2, "Error\n", 6);
-	else if (id == -2)
-		write(2, "Wrong number of arguments\n", 26);
-	else if (id == -3)
-		write(2, "Invalid Arguments\n", 17);
-	return (0);
+	return (1);
 }
 
 int	main(int ac, char **av)
@@ -96,6 +85,8 @@ int	main(int ac, char **av)
 	int		error;
 
 	vars = malloc(sizeof(t_vars));
+	if (!vars)
+		return (error_msg(-1));
 	error = check_init_args(ac, av, vars);
 	if (error != 1)
 		return (error_msg(error));
